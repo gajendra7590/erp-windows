@@ -1,0 +1,66 @@
+<?php
+
+namespace admin\controllers;
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use admin\controllers\BaseController;
+use common\helpers\Utils;
+use common\models\User;
+
+
+class DashboardController extends BaseController
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['index','top-vendors','top-experiences-by-order','get-all-counts'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ]
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+
+                ],
+            ],
+        ];
+    }
+
+    public function init(){
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\UnauthorizedHttpException();
+        }
+    }
+    public function actionIndex()
+    {
+        return $this->render('@app/views/dashboard/index',['data'=>[]]);
+    }
+
+    public function actionGetAllCounts(){
+
+        if( (Yii::$app->request->isAjax) && (Yii::$app->request->isGet) ){
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return array(
+                'total_exp_count' => 0,
+                'total_orders_count' => 0,
+                'total_users_count' => 0,
+                'total_vendors_count' => 0
+           );
+        }
+    }
+
+
+
+}
